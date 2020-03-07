@@ -10,7 +10,6 @@
 #include <hocon/config_exception.hpp>
 #include <internal/values/config_delayed_merge_object.hpp>
 #include <internal/values/config_delayed_merge.hpp>
-#include <leatherman/util/environment.hpp>
 #include <unordered_map>
 
 using namespace std;
@@ -607,6 +606,8 @@ TEST_CASE("complex resolve") {
     REQUIRE(57u == resolved->get_int("objB.d"));
 }
 
+// Commented out because of absence of Leatherman lib
+/*
 // TODO: env variable fallback legitimately fails: HC-74
 TEST_CASE("pending HC-74: fallback to env (pending)", "[!shouldfail]") {
     auto resolved = resolve(subst_env_var_object());
@@ -627,7 +628,7 @@ TEST_CASE("pending HC-74: fallback to env (pending)", "[!shouldfail]") {
         throw config_exception("None of the env vars we tried to use for testing were set");
     }
 }
-
+*/
 /* TODO: add tests after environment lookup bug is fixed: HC-74
  * noFallbackToEnvIfValuesAreNull
  * fallbackToEnvWhenRelativized

@@ -7,11 +7,9 @@
 #include <internal/container.hpp>
 #include <internal/values/config_delayed_merge.hpp>
 #include <internal/resolve_result.hpp>
-#include <leatherman/locale/locale.hpp>
+#include <internal/utils.hpp>
 #include <algorithm>
 
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
 
 using namespace std;
 
@@ -77,8 +75,7 @@ namespace hocon {
         render(result, indent, at_root, options);
     }
 
-    void config_value::render(std::string &result, int indent, bool at_root,
-                                       config_render_options options) const {
+    void config_value::render(std::string &result, int, bool, config_render_options) const {
         result += transform_to_string();
     }
 
@@ -123,7 +120,7 @@ namespace hocon {
 
     resolve_result<shared_value>
     config_value::resolve_substitutions(resolve_context const& context,
-                                        resolve_source const& source) const
+                                        resolve_source const&) const
     {
         return resolve_result<shared_value>(context, shared_from_this());
     }
@@ -170,11 +167,11 @@ namespace hocon {
         } catch (runtime_error& e) {
             throw e;
         } catch (exception& e) {
-            throw config_exception(_("Unexpected exception:{1}", e.what()));
+            throw config_exception(string_format("Unexpected exception: %s", e.what()));
         }
     }
 
-    shared_value config_value::no_exceptions_modifier::modify_child(string const& key, shared_value v) const {
+    shared_value config_value::no_exceptions_modifier::modify_child(string const&, shared_value v) const {
         return v->relativized(_prefix);
     }
 
@@ -196,7 +193,7 @@ namespace hocon {
 
     void config_value::require_not_ignoring_fallbacks() const {
         if (ignores_fallbacks()) {
-            throw config_exception(_("method should not have been called with ignores_fallbacks=true"));
+            throw config_exception("method should not have been called with ignores_fallbacks=true");
         }
     }
 
@@ -208,7 +205,7 @@ namespace hocon {
         if (ignores_fallbacks()) {
             return shared_from_this();
         } else {
-            throw config_exception(_("value class doesn't implement forced fallback-ignoring"));
+            throw config_exception("value class doesn't implement forced fallback-ignoring");
         }
     }
 
@@ -239,7 +236,7 @@ namespace hocon {
         require_not_ignoring_fallbacks();
 
         if (dynamic_cast<const config_object*>(this)) {
-            throw config_exception(_("Objects must reimplement merged_with_object"));
+            throw config_exception("Objects must reimplement merged_with_object");
         }
 
         return merged_with_non_object(move(stack), move(fallback));

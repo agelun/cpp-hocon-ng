@@ -164,7 +164,7 @@ namespace std
         return FwdListIter<T>(lst);
     }
     template<class T>
-    FwdListIter<T> end(List<T> const & lst)
+    FwdListIter<T> end(List<T> const & /*lst*/)
     {
         return FwdListIter<T>();
     }

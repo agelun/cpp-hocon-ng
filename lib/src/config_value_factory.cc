@@ -16,7 +16,7 @@ namespace hocon {
     public:
         // TODO: If use cases of from_any_ref require other types to produce config_nulls,
         // we can revise this behavior
-        shared_value operator()(boost::blank null_value) const {
+        shared_value operator()(boost::blank /*null_value*/) const {
             return make_shared<config_null>(nullptr);
         }
 

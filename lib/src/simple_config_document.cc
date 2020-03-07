@@ -3,12 +3,9 @@
 #include <hocon/config_exception.hpp>
 #include <internal/tokenizer.hpp>
 #include <internal/config_document_parser.hpp>
+#include <internal/utils.hpp>
 #include <sstream>
 #include <boost/algorithm/string.hpp>
-#include <leatherman/locale/locale.hpp>
-
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
 
 using namespace std;
 
@@ -20,7 +17,7 @@ namespace hocon {
     unique_ptr<config_document> simple_config_document::with_value_text(string path, string new_value) const
     {
         if (new_value.empty()) {
-            throw new config_exception(_("empty value for {1} passed to with_value_text", path));
+            throw new config_exception(string_format("empty value for %s passed to with_value_text", path.c_str()));
         }
 
         shared_origin origin = make_shared<simple_config_origin>("single value parsing");
@@ -36,7 +33,7 @@ namespace hocon {
                                                                    shared_ptr<config_value> new_value) const
     {
         if (!new_value) {
-            throw config_exception(_("null value for {1} passed to with_value", path));
+            throw config_exception(string_format("null value for %s passed to with_value", path.c_str()));
         }
         config_render_options options = config_render_options();
         options = options.set_origin_comments(false);

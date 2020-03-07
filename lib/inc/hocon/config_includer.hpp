@@ -49,5 +49,7 @@ namespace hocon {
          * @return a non-null config_object
          */
         virtual shared_object include(shared_include_context context, std::string what) const = 0;
+
+        virtual ~config_includer() = default;
     };
 }  // namespace hocon

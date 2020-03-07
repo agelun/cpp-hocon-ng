@@ -25,6 +25,7 @@ namespace hocon {
      */
     class LIBCPP_HOCON_EXPORT config_document {
     public:
+        virtual ~config_document() = default;
         /**
          * Returns a new config_document that is a copy of the current config_document,
          * but with the desired value set at the desired path. If the path exists, it will

@@ -3,12 +3,9 @@
 #include <internal/simple_include_context.hpp>
 #include <internal/values/simple_config_object.hpp>
 #include <internal/parseable.hpp>
+#include <internal/utils.hpp>
 #include <hocon/config_exception.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <leatherman/locale/locale.hpp>
-
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
 
 using namespace std;
 
@@ -19,7 +16,7 @@ namespace hocon {
     shared_includer simple_includer::with_fallback(shared_includer fallback) const {
         auto self = shared_from_this();
         if (self == fallback) {
-            throw config_exception(_("Trying to create includer cycle"));
+            throw config_exception("Trying to create includer cycle");
         } else if (_fallback == fallback) {
             return self;
         } else if (_fallback) {
@@ -123,7 +120,7 @@ namespace hocon {
             if (!options.get_allow_missing() && !got_something) {
                 if (fails.empty()) {
                     // this should not happen
-                    throw config_exception(_("Should not be reached: nothing found but no exceptions thrown"));
+                    throw config_exception("Should not be reached: nothing found but no exceptions thrown");
                 } else {
                     string sb;
                     for (auto &e : fails) {
@@ -156,7 +153,7 @@ namespace hocon {
         auto p = get_context()->relative_to(name);
         if (p == nullptr) {
             // avoid returning null
-            return parseable::new_not_found(name, _("include was not found: '{1}'", name), move(parse_options));
+            return parseable::new_not_found(name, string_format("include was not found: '%s'", name.c_str()), move(parse_options));
         } else {
             return p;
         }
@@ -172,7 +169,7 @@ namespace hocon {
         auto p = get_context()->relative_to(name);
         if (p == nullptr) {
             // avoid returning null
-            return parseable::new_not_found(name, _("include was not found: '{1}'", name), move(parse_options));
+            return parseable::new_not_found(name, string_format("include was not found: '%s'", name.c_str()), move(parse_options));
         } else {
             return p;
         }
@@ -181,7 +178,7 @@ namespace hocon {
     /** Proxy */
     simple_includer::proxy::proxy(std::shared_ptr<const config_includer> delegate) : _delegate(move(delegate)) { }
 
-    shared_includer simple_includer::proxy::with_fallback(shared_includer fallback) const {
+    shared_includer simple_includer::proxy::with_fallback(shared_includer /*fallback*/) const {
         // we never fall back
         return shared_from_this();
     }

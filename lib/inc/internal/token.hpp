@@ -19,6 +19,7 @@ namespace hocon {
     public:
         token(token_type type, shared_origin origin = nullptr,
               std::string token_text = "", std::string debug_string = "");
+        virtual ~token() = default;
 
         virtual token_type get_token_type() const;
         virtual std::string token_text() const;

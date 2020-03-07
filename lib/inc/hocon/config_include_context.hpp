@@ -21,6 +21,9 @@ namespace hocon {
     class LIBCPP_HOCON_EXPORT config_include_context {
     public:
         config_include_context() : _cur_dir(new std::string("")) {}
+
+        virtual ~config_include_context() = default;
+
         /**
          * Tries to find a name relative to whatever is doing the including, for
          * example in the same directory as the file doing the including. Returns

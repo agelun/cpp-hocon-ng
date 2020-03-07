@@ -4,10 +4,6 @@
 #include <internal/tokens.hpp>
 #include <internal/nodes/config_node_comment.hpp>
 #include <internal/nodes/config_node_path.hpp>
-#include <leatherman/locale/locale.hpp>
-
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
 
 using namespace std;
 
@@ -33,7 +29,7 @@ namespace hocon {
                 return make_shared<config_node_field>(move(children_copy));
             }
         }
-        throw config_exception(_("Field doesn't have a value."));
+        throw config_exception("Field doesn't have a value.");
     }
 
     shared_node_value config_node_field::get_value() const {
@@ -42,7 +38,7 @@ namespace hocon {
                 return value;
             }
         }
-        throw config_exception(_("Field node doesn't have a value."));
+        throw config_exception("Field node doesn't have a value.");
     }
 
     shared_ptr<const config_node_path> config_node_field::path() const {
@@ -51,7 +47,7 @@ namespace hocon {
                 return path_node;
             }
         }
-        throw config_exception(_("Field node does not have a path"));
+        throw config_exception("Field node does not have a path");
     }
 
     shared_token config_node_field::separator() const {

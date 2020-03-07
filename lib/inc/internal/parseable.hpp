@@ -48,6 +48,7 @@ namespace hocon {
         parseable() = default;
         parseable(parseable const&) = delete;
         parseable& operator=(parseable const&) = delete;
+        virtual ~parseable() = default;
 
     private:
         std::shared_ptr<config_document> parse_document(config_parse_options const& base_options) const;

@@ -1,6 +1,5 @@
 # Setup compiling the test executable. C++ compile flags are inherited from the parent directory.
-include_directories(${LEATHERMAN_CATCH_INCLUDE})
-
+add_definitions(-Wno-error)
 set(TEST_CASES
     concatenation_test.cc
     config_document_parser_test.cc
@@ -18,21 +17,19 @@ set(TEST_CASES
     program_options.cc
 )
 
-add_executable(lib${PROJECT_NAME}_test $<TARGET_OBJECTS:libprojectsrc> ${TEST_CASES} main.cc)
+add_executable(lib${PROJECT_NAME}_test $<TARGET_OBJECTS:lib${PROJECT_NAME}src> ${TEST_CASES} main.cc)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
     target_link_libraries(lib${PROJECT_NAME}_test rt)
 endif()
 
+target_include_directories(lib${PROJECT_NAME}_test PRIVATE ../../../Catch2/single_include/catch2)
+
 target_link_libraries(lib${PROJECT_NAME}_test
     ${Boost_LIBRARIES}
-    ${LEATHERMAN_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
+    Catch2
 )
-
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND BOOST_STATIC AND LEATHERMAN_USE_LOCALES)
-    target_link_libraries(lib${PROJECT_NAME}_test iconv)
-endif()
 
 add_test(NAME "unit_tests" COMMAND lib${PROJECT_NAME}_test)
 

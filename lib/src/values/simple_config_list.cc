@@ -7,10 +7,6 @@
 #include <internal/resolve_result.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <leatherman/locale/locale.hpp>
-
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
 
 using namespace std;
 
@@ -19,7 +15,7 @@ namespace hocon {
     struct simple_config_list::resolve_modifier : public modifier {
         resolve_modifier(resolve_context c, resolve_source s) : context(move(c)), source(move(s)) {}
 
-        shared_value modify_child_may_throw(string const& key, shared_value v) override
+        shared_value modify_child_may_throw(string const& /*key*/, shared_value v) override
         {
             resolve_result<shared_value> result = context.resolve(v, source);
             context = result.context;
@@ -37,7 +33,7 @@ namespace hocon {
     simple_config_list::simple_config_list(shared_origin origin, std::vector<shared_value> value,
                                            resolve_status status) : simple_config_list(move(origin), move(value)){
         if (status != _resolved) {
-            throw config_exception(_("simple_config_list created with wrong resolve status"));
+            throw config_exception("simple_config_list created with wrong resolve status");
         }
     }
 

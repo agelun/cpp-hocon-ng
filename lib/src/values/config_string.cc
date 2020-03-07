@@ -31,7 +31,7 @@ namespace hocon {
         return equals<config_string>(other, [&](config_string const& o) { return _text == o._text; });
     }
 
-    void config_string::render(std::string& s, int indent, bool at_root, config_render_options options) const {
+    void config_string::render(std::string& s, int /*indent*/, bool /*at_root*/, config_render_options options) const {
         string rendered;
 
         if (options.get_json()) {

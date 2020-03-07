@@ -64,6 +64,8 @@ namespace hocon {
             }
         }
         name_source() : name_source(nullptr) {}
+        virtual ~name_source() = default;
+
         virtual shared_parseable name_to_parseable(std::string name,
                                                    config_parse_options parse_options) const = 0;
 

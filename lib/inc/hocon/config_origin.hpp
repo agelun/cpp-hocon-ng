@@ -30,6 +30,7 @@ namespace hocon {
      */
     class config_origin {
     public:
+        virtual ~config_origin() = default;
         /**
          * Returns a string describing the origin of a value or exception. This will
          * never return null.

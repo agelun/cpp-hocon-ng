@@ -20,6 +20,7 @@ namespace hocon {
      */
     class LIBCPP_HOCON_EXPORT config_node {
     public:
+        virtual ~config_node() = default;
         /**
          * The original text of the input which was used to form this particular
          * node.

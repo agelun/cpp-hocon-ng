@@ -5,13 +5,9 @@
 #include <internal/resolve_context.hpp>
 #include <internal/resolve_result.hpp>
 #include <internal/resolve_source.hpp>
-
-#include <leatherman/locale/locale.hpp>
+#include <internal/utils.hpp>
 
 #include <algorithm>
-
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
 
 using namespace std;
 
@@ -20,12 +16,12 @@ namespace hocon {
     config_delayed_merge::config_delayed_merge(shared_origin origin, std::vector<shared_value> stack) :
         config_value(move(origin)), _stack(move(stack)) {
         if (_stack.empty()) {
-            throw config_exception(_("creating empty delayed merge value"));
+            throw config_exception("creating empty delayed merge value");
         }
 
         for (auto& v : stack) {
             if (dynamic_pointer_cast<const config_delayed_merge>(v) || dynamic_pointer_cast<const config_delayed_merge_object>(v)) {
-                throw config_exception(_("placed nested delayed_merge in a config_delayed_merge, should have consolidated stack"));
+                throw config_exception("placed nested delayed_merge in a config_delayed_merge, should have consolidated stack");
             }
         }
     }
@@ -34,7 +30,7 @@ namespace hocon {
         return config_delayed_merge::make_replacement(move(context), _stack, move(skipping));
     }
 
-    shared_value config_delayed_merge::make_replacement(resolve_context const &context,
+    shared_value config_delayed_merge::make_replacement(resolve_context const &/*context*/,
                                                         std::vector<shared_value> stack,
                                                         int skipping) {
         vector<shared_value> sub_stack(stack.begin() + skipping, stack.end());
@@ -56,11 +52,11 @@ namespace hocon {
     }
 
     config_value::type config_delayed_merge::value_type() const {
-        throw config_exception(_("called value_type() on value with unresolved substitutions, need to config#resolve() first, see API docs."));
+        throw config_exception("called value_type() on value with unresolved substitutions, need to config#resolve() first, see API docs.");
     }
 
     unwrapped_value config_delayed_merge::unwrapped() const {
-        throw config_exception(_("called unwrapped() on value with unresolved substitutions, need to config::resolve() first, see API docs."));
+        throw config_exception("called unwrapped() on value with unresolved substitutions, need to config::resolve() first, see API docs.");
     }
 
     vector<shared_value> config_delayed_merge::unmerged_values() const {
@@ -82,7 +78,7 @@ namespace hocon {
             resolve_source source_for_end = source;
 
             if (dynamic_pointer_cast<const replaceable_merge_stack>(end)) {
-                throw bug_or_broken_exception(_("A delayed merge should not contain another one"));
+                throw bug_or_broken_exception("A delayed merge should not contain another one");
             } else if (dynamic_pointer_cast<const unmergeable>(end)) {
                 shared_value remainder = replaceable->make_replacement(context, count+1);
 
@@ -160,12 +156,12 @@ namespace hocon {
         bool comment_merge = options.get_comments();
 
         if (comment_merge) {
-            s += _("# unresolved merge of {1} values follows (\n", to_string(stack.size()));
+            s += string_format("# unresolved merge of %zu values follows (\n", stack.size());
             if (at_key == "") {
                 indent(s, indent_value, options);
-                s += _("# this unresolved merge will not be parseable because it's at the root of the object =\n");
+                s += string_format("# this unresolved merge will not be parseable because it's at the root of the object =\n");
                 indent(s, indent_value, options);
-                s += _("# the HOCON format has no way to list multiple root objects in a single file \n");
+                s += string_format("# the HOCON format has no way to list multiple root objects in a single file \n");
             }
         }
 
@@ -178,9 +174,9 @@ namespace hocon {
             if (comment_merge) {
                 indent(s, indent_value, options);
                 if (at_key == "") {
-                    s += _("#     unmerged value {1} for key {2} from ", to_string(i), hocon::render_json_string(at_key));
+                    s += string_format("#     unmerged value %i for key %s from ", i, hocon::render_json_string(at_key).c_str());
                 } else {
-                    s += _("#     unmerged value {1} from ", to_string(i));
+                    s += string_format("#     unmerged value %i from ", i);
                 }
                 i++;
                 s += v->origin()->description();
@@ -217,7 +213,7 @@ namespace hocon {
         }
         if (comment_merge) {
             indent(s, indent_value, options);
-            s += _("# ) end of unresolved merge\n");
+            s += "# ) end of unresolved merge\n";
         }
     }
 }  // namespace hocon::config_delayed_merge

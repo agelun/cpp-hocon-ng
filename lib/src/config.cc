@@ -14,16 +14,12 @@
 #include <internal/values/simple_config_object.hpp>
 #include <internal/parseable.hpp>
 #include <internal/simple_includer.hpp>
+#include <internal/utils.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <leatherman/util/environment.hpp>
-#include <leatherman/locale/locale.hpp>
 
 #include <cfenv>
-
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
 
 using namespace std;
 
@@ -89,7 +85,7 @@ namespace hocon {
             if (_object->get_resolve_status() == resolve_status::RESOLVED) {
                 throw ex;
             }
-            throw config_exception(_("{1} has not been resolved, you need to call config::resolve()", raw_path.render()));
+            throw config_exception(string_format("%s has not been resolved, you need to call config::resolve()", raw_path.render().c_str()));
         }
         return peeked;
     }
@@ -133,7 +129,7 @@ namespace hocon {
         return entries;
     }
 
-    shared_value config::throw_if_null(shared_value v, config_value::type expected, path original_path) {
+    shared_value config::throw_if_null(shared_value v, config_value::type /*expected*/, path original_path) {
         if (v->value_type() == config_value::type::CONFIG_NULL) {
             // TODO Once we decide on a way of converting the type enum to a string, pass expected type string
             throw null_exception(*(v->origin()), original_path.render());
@@ -161,7 +157,7 @@ namespace hocon {
         if (expected != config_value::type::UNSPECIFIED &&
                 v->value_type() != expected &&
                 v->value_type() != config_value::type::CONFIG_NULL) {
-            throw wrong_type_exception(_("{1} could not be converted to the requested type", original_path.render()));
+            throw wrong_type_exception(string_format("%s could not be converted to the requested type", original_path.render().c_str()));
         } else {
             return v;
         }
@@ -184,7 +180,7 @@ namespace hocon {
             if (self->get_resolve_status() == resolve_status::RESOLVED) {
                 throw ex;
             }
-            throw config_exception(_("{1} has not been resolved, you need to call config::resolve()", desired_path.render()));
+            throw config_exception(string_format("%s has not been resolved, you need to call config::resolve()", desired_path.render().c_str()));
         }
     }
 
@@ -274,7 +270,7 @@ namespace hocon {
         for (auto item : *list) {
             shared_object obj = dynamic_pointer_cast<const config_object>(item);
             if (obj == nullptr) {
-                throw new config_exception(_("List does not contain only config_objects."));
+                throw new config_exception("List does not contain only config_objects.");
             }
             object_list.push_back(obj);
         }
@@ -287,7 +283,7 @@ namespace hocon {
         for (auto item : *list) {
             shared_config obj = dynamic_pointer_cast<const config>(item);
             if (obj == nullptr) {
-                throw config_exception(_("List does not contain only configs."));
+                throw config_exception("List does not contain only configs.");
             }
             object_list.push_back(obj);
         }
@@ -306,7 +302,7 @@ namespace hocon {
                 try {
                     long_list.push_back(boost::get<int>(item));
                 } catch (boost::bad_get &ex) {
-                    throw config_exception(_("The list did not contain only the desired type."));
+                    throw config_exception("The list did not contain only the desired type.");
                 }
             }
         }
@@ -324,7 +320,7 @@ namespace hocon {
         } else if (auto str = dynamic_pointer_cast<const config_string>(v)) {
             return parse_duration(str->transform_to_string(), str->origin(), path);
         } else {
-            throw bad_value_exception(*v->origin(), path, _("Value at '{1}' was not a number or string.", path));
+            throw bad_value_exception(*v->origin(), path, string_format("Value at '%s' was not a number or string.", path.c_str()));
         }
     }
 
@@ -354,10 +350,10 @@ namespace hocon {
                 result = timespan.first / 86400;
                 break;
             default:
-                throw config_exception(_("Not a valid time_unit"));
+                throw config_exception("Not a valid time_unit");
         }
         if ((result >= 0) != (timespan.first >= 0)) {
-            throw config_exception(_("as_long: Overflow occurred during time conversion"));
+            throw config_exception("as_long: Overflow occurred during time conversion");
         }
         return result;
     }
@@ -391,10 +387,10 @@ namespace hocon {
                 seconds = number * 86400;
                 break;
             default:
-                throw config_exception(_("Not a valid time_unit"));
+                throw config_exception("Not a valid time_unit");
         }
         if ((number >= 0) != (seconds >= 0)) {
-            throw config_exception(_("convert_long: Overflow occurred during time conversion"));
+            throw config_exception("convert_long: Overflow occurred during time conversion");
         }
         return duration(seconds, nanos);
     }
@@ -432,10 +428,10 @@ namespace hocon {
                 nanos = fmod(number * 86400, 1) * 1000000000;
                 break;
             default:
-                throw config_exception(_("Not a valid time_unit"));
+                throw config_exception("Not a valid time_unit");
         }
         if (!isnormal(seconds) || !isnormal(nanos)) {
-            throw config_exception(_("convert_double: Overflow occurred during time conversion"));
+            throw config_exception("convert_double: Overflow occurred during time conversion");
         }
         return duration(static_cast<int64_t>(seconds), static_cast<int>(nanos));
     }
@@ -456,7 +452,7 @@ namespace hocon {
         } else if (unit_string == "d" || unit_string == "days") {
             return time_unit::DAYS;
         } else {
-            throw config_exception(_("Could not parse time unit '{1}' (try ns, us, ms, s, m, h, or d)", unit_string));
+            throw config_exception(string_format("Could not parse time unit '%s' (try ns, us, ms, s, m, h, or d)", unit_string.c_str()));
         }
     }
 
@@ -467,7 +463,7 @@ namespace hocon {
         string number_string = boost::algorithm::trim_copy(input.substr(0, input.length() - unit_string.length()));
 
         if (number_string.empty()) {
-            throw bad_value_exception(*origin_for_exception, path_for_exception, _("No number in duration value '{1}'", input));
+            throw bad_value_exception(*origin_for_exception, path_for_exception, string_format("No number in duration value '%s'", input.c_str()));
         }
 
         if (unit_string.length() > 2 && unit_string.back() != 's') {
@@ -483,7 +479,7 @@ namespace hocon {
                 return convert(number, get_units(unit_string));
             }
             catch (boost::bad_lexical_cast& ex) {
-                throw bad_value_exception(*origin_for_exception, path_for_exception, _("Value '{1}' could not be converted to a number.", number_string));
+                throw bad_value_exception(*origin_for_exception, path_for_exception, string_format("Value '%s' could not be converted to a number.", number_string.c_str()));
             }
         }
     }
@@ -496,7 +492,7 @@ namespace hocon {
         if (auto newobj = dynamic_pointer_cast<const config_object>(_object->with_fallback(other))) {
             return newobj->to_config();
         } else {
-            throw bug_or_broken_exception(_("Creating new object from config_object did not return a config_object"));
+            throw bug_or_broken_exception("Creating new object from config_object did not return a config_object");
         }
     }
 
@@ -540,9 +536,9 @@ namespace hocon {
         return _default_includer;
     }
 
-    void config::check_valid(shared_config reference, std::vector<std::string> restrict_to_paths) const {
+    void config::check_valid(shared_config /*reference*/, std::vector<std::string> /*restrict_to_paths*/) const {
         // TODO: implement this once resolve functionality is working
-        throw runtime_error(_("Method not implemented"));
+        throw runtime_error("Method not implemented");
     }
 
     shared_value config::peek_path(path desired_path) const {
@@ -559,15 +555,14 @@ namespace hocon {
     }
 
     shared_object config::env_variables_as_config_object() {
+        //TODO: Implement!
         unordered_map<string, shared_value> values;
-        leatherman::util::environment::each([&](string& k, string& v) {
+        /*leatherman::util::environment::each([&](string& k, string& v) {
             auto origin = make_shared<simple_config_origin>("env var " + k);
             values.emplace(k, make_shared<config_string>(origin, v, config_string_type::QUOTED));
             return true;
-        });
+        });*/
         auto origin = make_shared<simple_config_origin>("env variables");
         return make_shared<simple_config_object>(origin, move(values), resolve_status::RESOLVED, false);
     }
-
-
 }  // namespace hocon

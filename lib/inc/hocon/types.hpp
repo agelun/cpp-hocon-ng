@@ -8,7 +8,7 @@
 #if defined(__GNUC__) && __GNUC__ > 5
 #pragma GCC diagnostic ignored "-Wnonnull-compare"
 #endif
-#include "boost/variant.hpp"
+#include <boost/variant.hpp>
 #pragma GCC diagnostic pop
 
 namespace hocon {

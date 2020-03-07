@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "config_origin.hpp"
@@ -8,7 +7,6 @@
 #include <string>
 #include <vector>
 #include "export.h"
-#include <leatherman/locale/locale.hpp>
 
 namespace hocon {
 
@@ -65,7 +63,7 @@ namespace hocon {
                 case type::CONFIG_NULL: return "null";
                 case type::STRING: return "string";
                 case type::UNSPECIFIED: return "unspecified";
-                default: throw std::logic_error(leatherman::locale::format("Got impossible value for type enum"));
+                default: throw std::logic_error("Got impossible value for type enum");
             }
         }
 
@@ -178,7 +176,7 @@ namespace hocon {
          * @return value relativized to the given path or the same value if nothing
          *         to do
          */
-        virtual shared_value relativized(std::string prefix) const { return shared_from_this(); }
+        virtual shared_value relativized(std::string /*prefix*/) const { return shared_from_this(); }
 
         virtual resolve_status get_resolve_status() const;
 

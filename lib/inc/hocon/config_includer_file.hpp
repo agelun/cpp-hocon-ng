@@ -25,6 +25,8 @@ namespace hocon {
          * @return a non-null config_object
          */
         virtual shared_object include_file(shared_include_context context, std::string what) const = 0;
+
+        virtual ~config_includer_file() = default;
     };
 
 }  // namespace hocon

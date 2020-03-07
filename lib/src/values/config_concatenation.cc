@@ -10,10 +10,7 @@
 #include <internal/resolve_result.hpp>
 #include <internal/resolve_source.hpp>
 #include <internal/resolve_context.hpp>
-#include <leatherman/locale/locale.hpp>
-
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
+#include <internal/utils.hpp>
 
 using namespace std;
 
@@ -22,13 +19,13 @@ namespace hocon {
     config_concatenation::config_concatenation(shared_origin origin, std::vector<shared_value> pieces) :
             config_value(move(origin)), _pieces(move(pieces)) {
         if (_pieces.size() < 2) {
-            throw config_exception(_("Created concatenation with less than 2 items"));
+            throw config_exception("Created concatenation with less than 2 items");
         }
 
         bool had_unmergeable = false;
         for (shared_value p : _pieces) {
             if (dynamic_pointer_cast<const config_concatenation>(p)) {
-                throw config_exception(_("config_concatenation should never be nested"));
+                throw config_exception("config_concatenation should never be nested");
             }
 
             if (dynamic_pointer_cast<const unmergeable>(p)) {
@@ -37,7 +34,7 @@ namespace hocon {
         }
 
         if (!had_unmergeable) {
-            throw config_exception(_("Created concatenation without an unmergeable in it"));
+            throw config_exception("Created concatenation without an unmergeable in it");
         }
     }
 
@@ -105,7 +102,7 @@ namespace hocon {
         } else if (joined.size() == 1) {
             return make_resolve_result(new_context, joined.front());
         } else {
-            throw config_exception(_("Bug in the library: resolved list was joined to too many values"));
+            throw config_exception("Bug in the library: resolved list was joined to too many values");
         }
     }
 
@@ -182,7 +179,7 @@ namespace hocon {
     }
 
     unwrapped_value config_concatenation::unwrapped() const {
-        throw config_exception(_("Not resolved, call config::resolve() before attempting to unwrap. See API docs."));
+        throw config_exception("Not resolved, call config::resolve() before attempting to unwrap. See API docs.");
     }
 
     bool config_concatenation::ignores_fallbacks() const {
@@ -199,7 +196,7 @@ namespace hocon {
     }
 
     config_exception config_concatenation::not_resolved() const {
-        return config_exception(_("need to config#resolve(), see the API docs for config#resolve; substitution not resolved"));
+        return config_exception("need to config#resolve(), see the API docs for config#resolve; substitution not resolved");
     }
 
     bool config_concatenation::is_ignored_whitespace(shared_value value) {
@@ -235,7 +232,7 @@ namespace hocon {
             joined = left;
             // it should be impossible that left is whitespace and right is a list or object
         } else if (dynamic_pointer_cast<const config_concatenation>(left) || dynamic_pointer_cast<const config_concatenation>(right)) {
-            throw config_exception(_("unflattened config_concatenation"));
+            throw config_exception("unflattened config_concatenation");
         } else if (dynamic_pointer_cast<const unmergeable>(left) || dynamic_pointer_cast<const unmergeable>(right)) {
             // leave joined=null, cannot join
         } else {
@@ -243,7 +240,7 @@ namespace hocon {
             string s1 { left->transform_to_string() };
             string s2 { right->transform_to_string() };
             if (s1.empty() || s2.empty()) {
-                throw config_exception(_("Cannot concatenate object or list with a non-object-or-list: {1} and {2} are not compatible", s1, s2));
+                throw config_exception(string_format("Cannot concatenate object or list with a non-object-or-list: '%s' and '%s' are not compatible", s1.c_str(), s2.c_str()));
             } else {
                 auto joined_origin = simple_config_origin::merge_origins(left->origin(), right->origin());
                 joined = make_shared<config_string>(move(joined_origin), s1 + s2, config_string_type::QUOTED);

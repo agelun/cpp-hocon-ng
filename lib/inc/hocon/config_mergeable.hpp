@@ -8,6 +8,7 @@ namespace hocon {
     class LIBCPP_HOCON_EXPORT config_mergeable {
         friend class config_value;
     public:
+        virtual ~config_mergeable() = default;
         /**
          * Returns a new value computed by merging this value with another, with
          * keys in this value "winning" over the other one.

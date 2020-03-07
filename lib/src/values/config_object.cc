@@ -2,12 +2,9 @@
 #include <hocon/config.hpp>
 #include <internal/simple_config_origin.hpp>
 #include <internal/values/config_delayed_merge_object.hpp>
+#include <internal/utils.hpp>
 #include <hocon/config_exception.hpp>
 #include <hocon/path.hpp>
-#include <leatherman/locale/locale.hpp>
-
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
 
 using namespace std;
 
@@ -34,7 +31,7 @@ namespace hocon {
                 }
             }
         } catch (config_exception& ex) {
-            throw config_exception(_("{1} has not been resolved, you need to call config::resolve()", desired_path.render()));
+            throw config_exception(string_format("%s has not been resolved, you need to call config::resolve()", desired_path.render().c_str()));
         }
     }
 
@@ -42,7 +39,7 @@ namespace hocon {
         try {
             return attempt_peek_with_partial_resolve(key);
         } catch (config_exception& ex) {
-            throw config_exception(_("{1} has not been resolved, you need to call config::resolve()", original_path.render()));
+            throw config_exception(string_format("%s has not been resolved, you need to call config::resolve()", original_path.render().c_str()));
         }
     }
 
@@ -64,7 +61,7 @@ namespace hocon {
 
     shared_origin config_object::merge_origins(std::vector<shared_value> const& stack) {
         if (stack.empty()) {
-            throw config_exception(_("can't merge origins on empty list"));
+            throw config_exception("can't merge origins on empty list");
         }
 
         vector<shared_origin> origins;

@@ -5,12 +5,10 @@
 #include <internal/values/config_double.hpp>
 #include <internal/values/config_long.hpp>
 #include <internal/values/config_string.hpp>
+#include <internal/utils.hpp>
 #include <boost/nowide/fstream.hpp>
+#include <boost/nowide/convert.hpp>
 #include <boost/lexical_cast.hpp>
-#include <leatherman/locale/locale.hpp>
-
-// Mark string for translation (alias for leatherman::locale::format)
-using leatherman::locale::_;
 
 using namespace std;
 
@@ -146,7 +144,7 @@ namespace hocon {
         if (first_char == '/') {
             int discard = _input->get();
             if (discard != '/') {
-                throw config_exception(_("called pull_comment() but // not seen"));
+                throw config_exception("called pull_comment() but // not seen");
             }
             double_slash = true;
         }
@@ -251,7 +249,7 @@ namespace hocon {
             // not a number after all, see if it's an unquoted string
             for (char character : result) {
                 if (not_in_unquoted_text.find(character) != string::npos) {
-                    throw config_exception(_("Line {1}: Reserved character '{2}' not allowed outside quotes", std::to_string(_line_number), character));
+                    throw config_exception(string_format("Line %i: Reserved character '%c' not allowed outside quotes", _line_number, character));
                 }
             }
             // no disallowed chars, so we decide this was a string and not a number
@@ -261,7 +259,7 @@ namespace hocon {
 
     void token_iterator::pull_escape_sequence(string& parsed, string& original) {
         if (!*_input) {
-            throw config_exception(_("End of input but backslash in string had nothing after it"));
+            throw config_exception("End of input but backslash in string had nothing after it");
         }
 
         // This is needed so we return the unescaped escape characters back out when rendering
@@ -299,7 +297,7 @@ namespace hocon {
                 char utf[5] = {};
                 for (int i = 0; i < 4; i++) {
                     if (!*_input) {
-                        throw config_exception(_("End of input but expecting 4 hex digits for \\uXXXX escape"));
+                        throw config_exception("End of input but expecting 4 hex digits for \\uXXXX escape");
                     }
                     utf[i] = _input->get();
                 }
@@ -311,7 +309,7 @@ namespace hocon {
             }
                 break;
             default:
-                throw config_exception(_("backslash followed by {1}, this is not a valid escape sequence. (Quoted strings use JSON escaping, so use double-backslash \\\\ for literal backslash)", string(1, escaped)));
+                throw config_exception(string_format("backslash followed by '%c', this is not a valid escape sequence. (Quoted strings use JSON escaping, so use double-backslash \\\\ for literal backslash)", escaped));
         }
     }
 
@@ -330,7 +328,7 @@ namespace hocon {
             } else {
                 consecutive_quotes = 0;
                 if (!*_input) {
-                    throw config_exception(_("End of input but triple-quoted string was still open"));
+                    throw config_exception("End of input but triple-quoted string was still open");
                 } else if (c == '\n') {
                     _line_number++;
                     _line_origin = _origin->with_line_number(_line_number);
@@ -352,7 +350,7 @@ namespace hocon {
 
         while (true) {
             if (!*_input) {
-                throw config_exception(_("End of input but string quote was still open"));
+                throw config_exception("End of input but string quote was still open");
             }
 
             char c = _input->get();
@@ -362,7 +360,7 @@ namespace hocon {
                 original += '"';
                 break;
             } else if (is_C0_control(c)) {
-                throw config_exception(_("Line {1}: JSON does not allow unescaped {2} in quoted strings, use a backslash escape", std::to_string(_line_number), string(1, c)));
+                throw config_exception(string_format("Line %i: JSON does not allow unescaped '%c' in quoted strings, use a backslash escape", _line_number, c));
             } else {
                 result += c;
                 original += c;
@@ -387,7 +385,7 @@ namespace hocon {
     shared_token const& token_iterator::pull_plus_equals() {
         char c = _input->get();
         if (c != '=') {
-            throw config_exception(_("'+' not followed by '=', '{1}' not allowed after '+'", string(1, c)));
+            throw config_exception(string_format("'+' not followed by '=', '%c' not allowed after '+'", c));
         }
         return tokens::plus_equals_token();
     }
@@ -397,7 +395,7 @@ namespace hocon {
         auto const& origin = _line_origin;
         char c = _input->get();
         if (c != '{') {
-            throw config_exception(_("'$' not followed by '{', '{1}' not allowed after '$'", string(1, c)));
+            throw config_exception(string_format("'$' not followed by '{', '%c' not allowed after '$'", c));
         }
 
         bool optional = false;
@@ -422,7 +420,7 @@ namespace hocon {
                 // we found the end of the substitution
                 break;
             } else if (t == tokens::end_token()) {
-                throw config_exception(_("Substitution '${' was not closed with a '}'"));
+                throw config_exception("Substitution '${' was not closed with a '}'");
             } else {
                 shared_token whitespace = saver.check(t->get_token_type(), origin, _line_number);
                 if (whitespace != nullptr) {
@@ -489,7 +487,7 @@ namespace hocon {
                     if (first_number_chars().find(c) != string::npos) {
                         t = pull_number(c);
                     } else if (not_in_unquoted_text.find(c) != string::npos) {
-                        throw config_exception(_("Reserved character '{1}' is not allowed outside quotes", string(1, c)));
+                        throw config_exception(string_format("Reserved character '%c' is not allowed outside quotes", c));
                     } else {
                         _input->putback(c);
                         t = pull_unquoted_text();
@@ -498,7 +496,7 @@ namespace hocon {
             }
 
             if (t == nullptr) {
-                throw config_exception(_("Failed to generate next token"));
+                throw config_exception("Failed to generate next token");
             }
 
             return t;
@@ -532,7 +530,7 @@ namespace hocon {
                 // see how exceptions are handled elsewhere before switching
             }
             if (_tokens.empty()) {
-                throw config_exception(_("Tokens queue should not be empty here"));
+                throw config_exception("Tokens queue should not be empty here");
             }
         }
         return t;

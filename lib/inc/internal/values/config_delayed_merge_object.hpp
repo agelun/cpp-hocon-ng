@@ -25,8 +25,8 @@ namespace hocon {
         // map interface
         bool is_empty() const override { throw not_resolved(); }
         size_t size() const override { throw not_resolved(); }
-        shared_value operator[](std::string const& key) const override { throw not_resolved(); }
-        shared_value get(std::string const& key) const override { throw not_resolved(); }
+        shared_value operator[](std::string const& /*key*/) const override { throw not_resolved(); }
+        shared_value get(std::string const& /*key*/) const override { throw not_resolved(); }
         iterator begin() const override { throw not_resolved(); }
         iterator end() const override { throw not_resolved(); }
         unwrapped_value unwrapped() const override;

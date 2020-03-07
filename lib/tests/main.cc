@@ -1,8 +1,4 @@
-#define CATCH_CONFIG_RUNNER
-#include <catch.hpp>
+#define CATCH_CONFIG_MAIN
 
-int main(int argc, char **argv)
-{
-    return Catch::Session().run(argc, argv);
-}
+#include <catch.hpp>
 
