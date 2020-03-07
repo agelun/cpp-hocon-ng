@@ -51,8 +51,8 @@ This is a mostly complete implementation of the HOCON format. It currently has s
 * GCC >= 4.8 or Clang >= 3.4 (with libc++)
 * CMake >= 3.2.2
 * Boost Libraries >= 1.54
-* [Leatherman](https://github.com/puppetlabs/leatherman)
 
+NB: Leatherman was excluded from the dependencies list in this fork
 
 ## Pre-Build
 
