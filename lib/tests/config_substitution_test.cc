@@ -96,6 +96,7 @@ static shared_object subst_complex_object() {
     return resolved;
 }
 
+/*
 static shared_object subst_env_var_object() {
     static auto const resolved = parse_object(R"(
 {
@@ -110,6 +111,7 @@ static shared_object subst_env_var_object() {
 
     return resolved;
 }
+*/
 
 static shared_config resolve_without_fallbacks (shared_object v) {
     auto options = config_resolve_options(false);

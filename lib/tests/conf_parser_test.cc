@@ -319,7 +319,7 @@ static void assert_comments(vector<string> const& comments, shared_config conf, 
     REQUIRE(comments == conf->get_value(path)->origin()->comments());
 }
 
-static void assert_comments(vector<string> const& comments, shared_config conf, string const& path, int index) {
+static void assert_comments(vector<string> const& /*comments*/, shared_config /*conf*/, string const& /*path*/, int /*index*/) {
     // TODO:
     // auto v = conf->get_list(path)->get(index);
     // REQUIRE(comments == v->origin()->comments());

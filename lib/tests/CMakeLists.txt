@@ -1,5 +1,4 @@
 # Setup compiling the test executable. C++ compile flags are inherited from the parent directory.
-add_definitions(-Wno-error)
 set(TEST_CASES
     concatenation_test.cc
     config_document_parser_test.cc
@@ -28,7 +27,6 @@ target_include_directories(lib${PROJECT_NAME}_test PRIVATE ../../../Catch2/singl
 target_link_libraries(lib${PROJECT_NAME}_test
     ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
-    Catch2
 )
 
 add_test(NAME "unit_tests" COMMAND lib${PROJECT_NAME}_test)

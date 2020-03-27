@@ -421,7 +421,7 @@ namespace hocon { namespace test_utils {
         return result;
     }
 
-    std::vector<parse_test> whitespace_variations(vector<parse_test> const& tests, bool valid_in_lift) {
+    std::vector<parse_test> whitespace_variations(vector<parse_test> const& tests, bool /*valid_in_lift*/) {
         vector<function<string(string const&)>> variations = {
             [](string const& s) { return s; },
             [](string const& s) { return " " + s; },

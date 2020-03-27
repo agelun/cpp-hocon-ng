@@ -1,6 +1,7 @@
 #include <internal/utils.hpp>
 
 #include <cstdarg>
+#include <cstring>
 #include <functional>
 #include <string>
 

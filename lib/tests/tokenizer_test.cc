@@ -2,6 +2,7 @@
 #include <internal/tokenizer.hpp>
 #include "test_utils.hpp"
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 using namespace hocon;
