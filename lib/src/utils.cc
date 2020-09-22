@@ -3,6 +3,7 @@
 #include <cstdarg>
 #include <cstring>
 #include <functional>
+#include <limits>
 #include <string>
 
 namespace hocon {
