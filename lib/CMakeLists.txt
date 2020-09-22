@@ -76,4 +76,6 @@ target_link_libraries(lib${PROJECT_NAME} ${Boost_LIBRARIES})
 
 install(DIRECTORY inc/hocon DESTINATION include)
 
-add_subdirectory(tests)
+if (ENABLE_HOCON_TESTS)
+    add_subdirectory(tests)
+endif()

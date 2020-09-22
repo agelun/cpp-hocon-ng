@@ -5,6 +5,9 @@ project(cpp-hocon VERSION 0.2.2)
 string(MAKE_C_IDENTIFIER ${PROJECT_NAME} PROJECT_C_NAME)
 string(TOUPPER ${PROJECT_C_NAME} PROJECT_NAME_UPPER)
 string(TOLOWER ${PROJECT_C_NAME} PROJECT_NAME_LOWER)
+set(CMAKE_CXX_STANDARD 11)
+
+option(ENABLE_HOCON_TESTS "Enable building of HOCON tests (Requires Catch installed)" OFF)
 
 # Common cmake setup
 if (NOT CMAKE_BUILD_TYPE)
